@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Quay Số May Mắn 2026</title>
+    <title>Hệ Thống Quay Số Độc Lập 2026</title>
     <style>
         :root { --gold: #ffd700; --petal: #ffb7c5; --red-deep: #8b0000; }
         body { 
             font-family: -apple-system, Arial, sans-serif; 
-            /* SỬ DỤNG FILE hinh-nen.png CỦA BẠN */
             background: url('hinh-nen.png') no-repeat center center fixed;
             background-size: cover; margin: 0; display: flex; flex-direction: column; 
             align-items: center; min-height: 100vh; color: white; overflow-x: hidden;
@@ -22,17 +21,13 @@
         }
         input, select { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; font-weight: bold; font-size: 1rem; }
 
-        /* Banner & Decoration */
         .header-banner { position: fixed; top: 15px; width: 85%; max-width: 500px; z-index: 10; }
         .header-banner img { width: 100%; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); }
-        .lantern { position: fixed; top: -5px; font-size: 40px; z-index: 5; animation: swing 3s infinite alternate; transform-origin: top center; }
-        .lantern-left { left: 5%; } .lantern-right { right: 5%; }
-        @keyframes swing { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } }
 
         /* Game Area */
-        #game-area { display: none; width: 100%; justify-content: center; align-items: flex-end; gap: 15px; margin-top: 120px; z-index: 2; padding-bottom: 50px; flex-wrap: wrap; }
-        .wheel-unit { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .wheel-label { background: var(--gold); color: #8b0000; padding: 5px 15px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
+        #game-area { display: none; width: 100%; justify-content: center; align-items: flex-start; gap: 20px; margin-top: 130px; z-index: 2; padding-bottom: 50px; flex-wrap: wrap; }
+        .wheel-unit { display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.2); }
+        .wheel-label { background: var(--gold); color: #8b0000; padding: 5px 20px; border-radius: 10px; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 0 #b38f00; }
 
         /* Wheel Styling */
         .wheel-box { position: relative; }
@@ -41,16 +36,17 @@
             width: 25px; height: 35px; background: #ff0000; 
             clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; border: 2px solid var(--gold);
         }
-        canvas { border: 6px solid var(--gold); border-radius: 50%; background: #222; width: 220px; height: 220px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        canvas { border: 6px solid var(--gold); border-radius: 50%; background: #222; width: 220px; height: 220px; }
 
-        /* Spin Button */
-        #spin-action { margin-top: 30px; display: none; z-index: 15; }
-        button {
-            padding: 15px 60px; font-size: 1.5rem; font-weight: bold; cursor: pointer;
+        /* Individual Buttons */
+        .spin-btn {
+            padding: 10px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer;
             background: linear-gradient(to bottom, #ff4d4d, #b30000); color: var(--gold); 
-            border: 2px solid var(--gold); border-radius: 50px; box-shadow: 0 6px 0 #660000;
+            border: 2px solid var(--gold); border-radius: 30px; box-shadow: 0 4px 0 #660000;
+            transition: 0.1s;
         }
-        button:active { transform: translateY(3px); box-shadow: 0 3px 0 #660000; }
+        .spin-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #660000; }
+        .spin-btn:disabled { background: #444; border-color: #666; color: #888; box-shadow: none; cursor: not-allowed; }
 
         /* Result Popup */
         #result-display {
@@ -68,34 +64,27 @@
 <body>
 
 <div class="header-banner"><img src="image_6ab226.png" alt="Khai Xuân Nhận Lộc"></div>
-<div class="lantern lantern-left">🧧</div><div class="lantern lantern-right">🧧</div>
 
 <div id="setup-panel">
     <h3 style="color: var(--gold);">THIẾT LẬP HỆ THỐNG</h3>
     <label>Số lượng vòng quay:</label>
     <select id="wheel-count">
-        <option value="2">2 Vòng (Hàng Chục - Đơn Vị)</option>
+        <option value="2">2 Vòng (Chục - Đơn Vị)</option>
         <option value="3" selected>3 Vòng (Trăm - Chục - Đơn Vị)</option>
     </select>
-    
-    <label>Số nan trên mỗi vòng (0 - ?):</label>
+    <label>Số nan trên mỗi vòng:</label>
     <input type="number" id="slots-count" value="10" min="2" max="20">
-    
-    <button onclick="startSystem()">TẠO HỆ THỐNG</button>
+    <button class="spin-btn" style="margin-top:10px" onclick="startSystem()">TẠO HỆ THỐNG</button>
 </div>
 
 <div id="game-area"></div>
 
-<div id="spin-action">
-    <button id="mainSpinBtn">QUAY TẤT CẢ</button>
-</div>
-
 <div id="result-display">
     <h2 style="margin:0;">🧧 CHÚC MỪNG TÂN XUÂN 🧧</h2>
     <p style="font-size: 1.2rem; margin-top:15px;">CON SỐ MAY MẮN LÀ:</p>
-    <div class="lucky-number" id="final-number">000</div>
+    <div class="lucky-number" id="final-number">---</div>
     <br>
-    <button onclick="closeModal()">TIẾP TỤC</button>
+    <button class="spin-btn" onclick="closeModal()">TIẾP TỤC</button>
 </div>
 
 <audio id="mainSound" src="quay-so-ngan.mp3" playsinline preload="auto"></audio>
@@ -123,6 +112,7 @@
                     <div class="pointer"></div>
                     <canvas id="wheel-${i}" width="400" height="400"></canvas>
                 </div>
+                <button class="spin-btn" id="btn-${i}" onclick="spinIndividual(${i})">QUAY</button>
             `;
             gameArea.appendChild(unit);
 
@@ -132,23 +122,23 @@
             }
 
             wheelStates.push({
-                canvas: document.getElementById(`wheel-${i}`),
                 prizes: wheelPrizes,
                 rotation: 0,
                 isSpinning: false,
-                result: 0
+                hasFinished: false,
+                result: null
             });
-            draw(idx = i);
+            draw(i);
         }
 
         document.getElementById('setup-panel').style.display = 'none';
         document.getElementById('game-area').style.display = 'flex';
-        document.getElementById('spin-action').style.display = 'block';
     }
 
     function draw(idx) {
+        const canvas = document.getElementById(`wheel-${idx}`);
+        const ctx = canvas.getContext('2d');
         const w = wheelStates[idx];
-        const ctx = w.canvas.getContext('2d');
         const arc = (Math.PI * 2) / w.prizes.length;
         ctx.clearRect(0, 0, 400, 400);
 
@@ -156,84 +146,4 @@
             const ang = w.rotation + i * arc;
             ctx.beginPath();
             ctx.fillStyle = p.color;
-            ctx.strokeStyle = "#fff";
-            ctx.lineWidth = 2;
-            ctx.moveTo(200, 200);
-            ctx.arc(200, 200, 195, ang, ang + arc);
-            ctx.fill(); ctx.stroke();
-
-            ctx.save();
-            ctx.fillStyle = "#fff";
-            ctx.translate(200, 200);
-            ctx.rotate(ang + arc / 2);
-            ctx.font = "bold 24px Arial";
-            ctx.textAlign = "right";
-            ctx.fillText(p.label, 180, 10);
-            ctx.restore();
-        });
-        ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(200, 200, 12, 0, Math.PI*2); ctx.fill();
-    }
-
-    document.getElementById('mainSpinBtn').onclick = function() {
-        if (wheelStates.some(w => w.isSpinning)) return;
-        
-        sound.currentTime = 0;
-        sound.play().catch(e => console.log("Audio play blocked"));
-        this.disabled = true;
-
-        wheelStates.forEach((w, idx) => {
-            w.isSpinning = true;
-            const targetIdx = Math.floor(Math.random() * w.prizes.length);
-            w.result = w.prizes[targetIdx].label;
-
-            const arc = (Math.PI * 2) / w.prizes.length;
-            const finalAngle = (w.prizes.length - targetIdx) * arc - arc/2 - (Math.PI/2);
-            
-            const duration = 4000 + (idx * 800); 
-            const totalRot = (Math.PI * 2) * (10 + idx * 2) + finalAngle;
-            let start = null;
-
-            function animate(now) {
-                if (!start) start = now;
-                let t = (now - start) / duration;
-                if (t > 1) t = 1;
-                w.rotation = (1 - Math.pow(1 - t, 4)) * totalRot;
-                draw(idx);
-                if (t < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    w.isSpinning = false;
-                    checkAllFinished();
-                }
-            }
-            requestAnimationFrame(animate);
-        });
-    };
-
-    function checkAllFinished() {
-        if (wheelStates.every(w => !w.isSpinning)) {
-            const finalNum = wheelStates.map(w => w.result).join('');
-            document.getElementById('final-number').innerText = finalNum;
-            setTimeout(() => {
-                document.getElementById('result-display').style.display = 'block';
-            }, 500);
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('result-display').style.display = 'none';
-        document.getElementById('mainSpinBtn').disabled = false;
-    }
-
-    setInterval(() => {
-        const p = document.createElement('div');
-        p.className = 'petal';
-        p.style.width = p.style.height = Math.random() * 8 + 5 + 'px';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.animationDuration = Math.random() * 3 + 4 + 's';
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 7000);
-    }, 400);
-</script>
-</body>
-</html>
+            ctx
