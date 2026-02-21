@@ -8,7 +8,8 @@
         :root { --gold: #ffd700; --petal: #ffb7c5; --red-deep: #8b0000; }
         body { 
             font-family: -apple-system, Arial, sans-serif; 
-            background: url('image_6aa27f.jpg') no-repeat center center fixed;
+            /* SỬ DỤNG FILE hinh-nen.png CỦA BẠN */
+            background: url('hinh-nen.png') no-repeat center center fixed;
             background-size: cover; margin: 0; display: flex; flex-direction: column; 
             align-items: center; min-height: 100vh; color: white; overflow-x: hidden;
         }
@@ -114,7 +115,6 @@
         const labels = count === 3 ? ["HÀNG TRĂM", "HÀNG CHỤC", "ĐƠN VỊ"] : ["HÀNG CHỤC", "ĐƠN VỊ"];
 
         for (let i = 0; i < count; i++) {
-            // Tạo HTML cho từng vòng quay
             const unit = document.createElement('div');
             unit.className = 'wheel-unit';
             unit.innerHTML = `
@@ -126,7 +126,6 @@
             `;
             gameArea.appendChild(unit);
 
-            // Khởi tạo dữ liệu nan (số 0, 1, 2...)
             let wheelPrizes = [];
             for (let s = 0; s < slots; s++) {
                 wheelPrizes.push({ label: s, color: colors[s % colors.length] });
@@ -139,7 +138,7 @@
                 isSpinning: false,
                 result: 0
             });
-            draw(i);
+            draw(idx = i);
         }
 
         document.getElementById('setup-panel').style.display = 'none';
@@ -172,7 +171,6 @@
             ctx.fillText(p.label, 180, 10);
             ctx.restore();
         });
-        // Center decoration
         ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(200, 200, 12, 0, Math.PI*2); ctx.fill();
     }
 
@@ -180,7 +178,7 @@
         if (wheelStates.some(w => w.isSpinning)) return;
         
         sound.currentTime = 0;
-        sound.play();
+        sound.play().catch(e => console.log("Audio play blocked"));
         this.disabled = true;
 
         wheelStates.forEach((w, idx) => {
@@ -191,7 +189,6 @@
             const arc = (Math.PI * 2) / w.prizes.length;
             const finalAngle = (w.prizes.length - targetIdx) * arc - arc/2 - (Math.PI/2);
             
-            // Thời gian dừng so le để tăng kịch tính (Vòng đơn vị dừng cuối)
             const duration = 4000 + (idx * 800); 
             const totalRot = (Math.PI * 2) * (10 + idx * 2) + finalAngle;
             let start = null;
@@ -228,7 +225,6 @@
         document.getElementById('mainSpinBtn').disabled = false;
     }
 
-    // Hoa đào rơi
     setInterval(() => {
         const p = document.createElement('div');
         p.className = 'petal';
