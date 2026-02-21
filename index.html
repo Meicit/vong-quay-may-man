@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Khai Xuân Nhận Lộc 2026 - Master Edition</title>
+    <title>Đại Tiệc Lì Xì 2026 - 2 Vòng Quay</title>
     <style>
         :root { --gold: #ffd700; --petal: #ffb7c5; --red-deep: #8b0000; }
         body { 
@@ -15,42 +15,45 @@
 
         /* Setup Panel */
         #setup-panel {
-            background: rgba(0, 0, 0, 0.85); padding: 20px; border-radius: 15px;
-            border: 2px solid var(--gold); margin-top: 100px; width: 300px; z-index: 20;
-            text-align: center;
+            background: rgba(0, 0, 0, 0.9); padding: 25px; border-radius: 15px;
+            border: 2px solid var(--gold); margin-top: 100px; width: 320px; z-index: 20;
+            text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
-        input, select { 
-            width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; font-weight: bold;
-        }
+        .setup-group { border-bottom: 1px solid #444; margin-bottom: 15px; padding-bottom: 10px; }
+        input, select { width: 90%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none; font-weight: bold; }
 
-        /* Banner & Lanterns */
+        /* Banner & Decoration */
         .header-banner { position: fixed; top: 15px; width: 85%; max-width: 500px; z-index: 10; }
         .header-banner img { width: 100%; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); }
         .lantern { position: fixed; top: -5px; font-size: 40px; z-index: 5; animation: swing 3s infinite alternate; transform-origin: top center; }
         .lantern-left { left: 5%; } .lantern-right { right: 5%; }
         @keyframes swing { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } }
 
-        /* Wheel */
-        .wheel-container { position: relative; margin-top: 120px; display: none; z-index: 2; }
+        /* Main Game Layout */
+        #game-area { display: none; width: 100%; flex-wrap: wrap; justify-content: center; gap: 40px; margin-top: 120px; z-index: 2; padding-bottom: 50px; }
+        .wheel-section { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+
+        /* Wheel Styling */
+        .wheel-box { position: relative; }
         .pointer {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 35px; height: 45px; background: #ff0000; 
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 40px; background: #ff0000; 
             clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; border: 2px solid var(--gold);
         }
-        canvas { border: 10px solid var(--gold); border-radius: 50%; background: #222; max-width: 80vw; max-height: 80vw; box-shadow: 0 0 50px rgba(0,0,0,0.6); }
+        canvas { border: 8px solid var(--gold); border-radius: 50%; background: #222; width: 320px; height: 320px; box-shadow: 0 0 30px rgba(0,0,0,0.6); }
 
-        /* Result Popup */
+        /* Popups */
         #result-display {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: #fffdf0; color: #333; padding: 30px; border-radius: 20px;
             text-align: center; display: none; z-index: 100; border: 5px solid #ff0000; width: 80%;
             box-shadow: 0 0 100px rgba(0,0,0,0.8);
         }
-        #result-display h1 { color: #d40000; font-size: 2rem; margin: 15px 0; }
-        #prize-info { font-size: 1.5rem; font-weight: bold; color: #b30000; }
+        #result-display h1 { color: #d40000; font-size: 1.8rem; margin: 10px 0; }
+        #prize-info { font-size: 2rem; font-weight: bold; color: #b30000; }
 
         button {
-            padding: 12px 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            padding: 12px 25px; font-size: 1rem; font-weight: bold; cursor: pointer;
             background: linear-gradient(to bottom, #ff4d4d, #b30000); color: var(--gold); 
             border: 2px solid var(--gold); border-radius: 50px; box-shadow: 0 4px 0 #660000;
         }
@@ -65,31 +68,51 @@
 <div class="lantern lantern-left">🧧</div><div class="lantern lantern-right">🧧</div>
 
 <div id="setup-panel">
-    <h3>CÀI ĐẶT VÒNG QUAY</h3>
-    <input type="number" id="qty1" placeholder="Số lượng Giải Nhất" value="1">
-    <input type="number" id="qty2" placeholder="Số lượng Giải Nhì" value="2">
-    <input type="number" id="qty3" placeholder="Số lượng Giải Ba" value="5">
-    <button onclick="initWheel()">TẠO VÒNG QUAY</button>
+    <h3>THIẾT LẬP 2 VÒNG QUAY</h3>
+    <div class="setup-group">
+        <p>Vòng Quay 1 (Trái)</p>
+        <input type="number" id="v1q1" placeholder="Số giải Nhất" value="1">
+        <input type="number" id="v1q2" placeholder="Số giải Nhì" value="3">
+    </div>
+    <div class="setup-group">
+        <p>Vòng Quay 2 (Phải)</p>
+        <input type="number" id="v2q1" placeholder="Số giải Nhất" value="1">
+        <input type="number" id="v2q2" placeholder="Số giải Nhì" value="3">
+    </div>
+    <button onclick="initBothWheels()">BẮT ĐẦU KHAI XUÂN</button>
 </div>
 
-<div id="play-controls" style="display:none; text-align:center; z-index:15; margin-top: 100px;">
-    <select id="current-prize-type">
-        <option value="Giải Nhất">Đang quay: Giải Nhất</option>
-        <option value="Giải Nhì">Đang quay: Giải Nhì</option>
-        <option value="Giải Ba">Đang quay: Giải Ba</option>
-        <option value="Giải Khuyến Khích">Đang quay: Giải Khuyến Khích</option>
-    </select>
-    <br>
-    <button id="spinBtn">QUAY NGAY</button>
-</div>
+<div id="game-area">
+    <div class="wheel-section">
+        <select id="prize-type-1">
+            <option value="Giải Nhất">V1: Quay giải Nhất</option>
+            <option value="Giải Nhì">V1: Quay giải Nhì</option>
+            <option value="Giải Ba">V1: Quay giải Ba</option>
+        </select>
+        <div class="wheel-box">
+            <div class="pointer"></div>
+            <canvas id="wheel1" width="400" height="400"></canvas>
+        </div>
+        <button id="spinBtn1">QUAY VÒNG 1</button>
+    </div>
 
-<div class="wheel-container" id="wheel-box">
-    <div class="pointer"></div>
-    <canvas id="wheel" width="500" height="500"></canvas>
+    <div class="wheel-section">
+        <select id="prize-type-2">
+            <option value="Giải Nhất">V2: Quay giải Nhất</option>
+            <option value="Giải Nhì">V2: Quay giải Nhì</option>
+            <option value="Giải Ba">V2: Quay giải Ba</option>
+        </select>
+        <div class="wheel-box">
+            <div class="pointer"></div>
+            <canvas id="wheel2" width="400" height="400"></canvas>
+        </div>
+        <button id="spinBtn2">QUAY VÒNG 2</button>
+    </div>
 </div>
 
 <div id="result-display">
     <h2 style="margin:0;">🧧 CHÚC MỪNG 🧧</h2>
+    <h3 id="wheel-source" style="color: #666; margin: 5px;">Từ Vòng Quay 1</h3>
     <h1>BẠN ĐÃ TRÚNG:</h1>
     <div id="prize-info">---</div>
     <p id="congrats-text" style="font-weight:bold;"></p>
@@ -99,73 +122,74 @@
 <audio id="mainSound" src="quay-so-ngan.mp3" playsinline preload="auto"></audio>
 
 <script>
-    const canvas = document.getElementById('wheel');
-    const ctx = canvas.getContext('2d');
-    const mainSound = document.getElementById('mainSound');
-    let prizes = [];
-    let currentRotation = 0;
-    let isSpinning = false;
+    const sound = document.getElementById('mainSound');
+    let wheels = [
+        { canvas: document.getElementById('wheel1'), prizes: [], rotation: 0, spinning: false },
+        { canvas: document.getElementById('wheel2'), prizes: [], rotation: 0, spinning: false }
+    ];
 
-    // Khởi tạo vòng quay dựa trên số lượng nhập vào
-    function initWheel() {
-        const q1 = parseInt(document.getElementById('qty1').value) || 0;
-        const q2 = parseInt(document.getElementById('qty2').value) || 0;
-        const q3 = parseInt(document.getElementById('qty3').value) || 0;
-
-        prizes = [];
-        for(let i=0; i<q1; i++) prizes.push({ label: "Giải Nhất", color: "#FFD700" });
-        for(let i=0; i<q2; i++) prizes.push({ label: "Giải Nhì", color: "#C0C0C0" });
-        for(let i=0; i<q3; i++) prizes.push({ label: "Giải Ba", color: "#CD7F32" });
-        
-        // Nếu ít giải quá, thêm giải may mắn cho đủ vòng
-        while(prizes.length < 8) prizes.push({ label: "Lộc Xuân", color: "#d40000" });
+    function initBothWheels() {
+        // Khởi tạo Vòng 1
+        setupWheelData(0, 'v1q1', 'v1q2');
+        // Khởi tạo Vòng 2
+        setupWheelData(1, 'v2q1', 'v2q2');
 
         document.getElementById('setup-panel').style.display = 'none';
-        document.getElementById('play-controls').style.display = 'block';
-        document.getElementById('wheel-box').style.display = 'block';
-        draw();
+        document.getElementById('game-area').style.display = 'flex';
+        draw(0); draw(1);
     }
 
-    function draw() {
-        const arc = (Math.PI * 2) / prizes.length;
-        ctx.clearRect(0, 0, 500, 500);
-        prizes.forEach((p, i) => {
-            const ang = currentRotation + i * arc;
+    function setupWheelData(idx, idQ1, idQ2) {
+        const q1 = parseInt(document.getElementById(idQ1).value) || 0;
+        const q2 = parseInt(document.getElementById(idQ2).value) || 0;
+        
+        wheels[idx].prizes = [];
+        for(let i=0; i<q1; i++) wheels[idx].prizes.push({ label: "Giải Nhất", color: "#FFD700" });
+        for(let i=0; i<q2; i++) wheels[idx].prizes.push({ label: "Giải Nhì", color: "#C0C0C0" });
+        while(wheels[idx].prizes.length < 8) wheels[idx].prizes.push({ label: "May Mắn", color: "#d40000" });
+    }
+
+    function draw(idx) {
+        const w = wheels[idx];
+        const ctx = w.canvas.getContext('2d');
+        const arc = (Math.PI * 2) / w.prizes.length;
+        ctx.clearRect(0, 0, 400, 400);
+        
+        w.prizes.forEach((p, i) => {
+            const ang = w.rotation + i * arc;
             ctx.beginPath();
             ctx.fillStyle = p.color;
             ctx.strokeStyle = "#fff";
-            ctx.lineWidth = 2;
-            ctx.moveTo(250, 250);
-            ctx.arc(250, 250, 245, ang, ang + arc);
+            ctx.moveTo(200, 200);
+            ctx.arc(200, 200, 195, ang, ang + arc);
             ctx.fill(); ctx.stroke();
+            
             ctx.save();
             ctx.fillStyle = (p.color === "#FFD700") ? "#333" : "#fff";
-            ctx.translate(250, 250);
+            ctx.translate(200, 200);
             ctx.rotate(ang + arc / 2);
-            ctx.font = "bold 16px Arial";
+            ctx.font = "bold 14px Arial";
             ctx.textAlign = "right";
-            ctx.fillText(p.label, 230, 10);
+            ctx.fillText(p.label, 185, 5);
             ctx.restore();
         });
-        ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(250, 250, 15, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(200, 200, 10, 0, Math.PI*2); ctx.fill();
     }
 
-    document.getElementById('spinBtn').onclick = function() {
-        if (isSpinning) return;
-        isSpinning = true;
-        this.disabled = true;
+    function startSpin(idx) {
+        if (wheels[idx].spinning) return;
+        wheels[idx].spinning = true;
+        document.getElementById('spinBtn' + (idx+1)).disabled = true;
 
-        mainSound.currentTime = 0;
-        mainSound.play();
+        sound.currentTime = 0;
+        sound.play();
 
-        const prizeType = document.getElementById('current-prize-type').value;
-        
-        // Logic tìm ô giải tương ứng với lựa chọn để dừng (Cheat ngầm)
-        let targetIdx = prizes.findIndex(p => p.label === prizeType);
-        if (targetIdx === -1) targetIdx = Math.floor(Math.random() * prizes.length);
+        const type = document.getElementById('prize-type-' + (idx+1)).value;
+        let targetIdx = wheels[idx].prizes.findIndex(p => p.label === type);
+        if (targetIdx === -1) targetIdx = Math.floor(Math.random() * wheels[idx].prizes.length);
 
-        const arc = (Math.PI * 2) / prizes.length;
-        const finalAngle = (prizes.length - targetIdx) * arc - arc/2 - (Math.PI/2);
+        const arc = (Math.PI * 2) / wheels[idx].prizes.length;
+        const finalAngle = (wheels[idx].prizes.length - targetIdx) * arc - arc/2 - (Math.PI/2);
         const duration = 4600;
         const totalRot = (Math.PI * 2) * 12 + finalAngle;
         let start = null;
@@ -174,27 +198,31 @@
             if (!start) start = now;
             let t = (now - start) / duration;
             if (t > 1) t = 1;
-            currentRotation = (1 - Math.pow(1 - t, 4)) * totalRot;
-            draw();
+            wheels[idx].rotation = (1 - Math.pow(1 - t, 4)) * totalRot;
+            draw(idx);
             if (t < 1) requestAnimationFrame(animate);
             else {
-                mainSound.onended = () => showResult(prizes[targetIdx].label, prizeType);
-                setTimeout(() => showResult(prizes[targetIdx].label, prizeType), 600);
+                showResult(idx, wheels[idx].prizes[targetIdx].label);
             }
         }
         requestAnimationFrame(animate);
-    };
+    }
 
-    function showResult(label, type) {
+    document.getElementById('spinBtn1').onclick = () => startSpin(0);
+    document.getElementById('spinBtn2').onclick = () => startSpin(1);
+
+    function showResult(idx, label) {
+        document.getElementById('wheel-source').innerText = `Từ Vòng Quay ${idx + 1}`;
         document.getElementById('prize-info').innerText = label;
-        document.getElementById('congrats-text').innerText = `Chúc mừng bạn đã nhận được ${type}!`;
+        document.getElementById('congrats-text').innerText = `Lộc xuân đã về với bạn!`;
         document.getElementById('result-display').style.display = 'block';
     }
 
     function closeModal() {
         document.getElementById('result-display').style.display = 'none';
-        document.getElementById('spinBtn').disabled = false;
-        isSpinning = false;
+        wheels[0].spinning = wheels[1].spinning = false;
+        document.getElementById('spinBtn1').disabled = false;
+        document.getElementById('spinBtn2').disabled = false;
     }
 
     // Hoa đào rơi
