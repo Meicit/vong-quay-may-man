@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khai Xuân Nhận Lộc 2026 - Master Edition</title>
+    <style>
+        :root { --gold: #ffd700; --petal: #ffb7c5; --red-deep: #8b0000; }
+        body { 
+            font-family: -apple-system, Arial, sans-serif; 
+            background: url('image_6aa27f.jpg') no-repeat center center fixed;
+            background-size: cover; margin: 0; display: flex; flex-direction: column; 
+            align-items: center; min-height: 100vh; color: white; overflow-x: hidden;
+        }
+
+        /* Setup Panel */
+        #setup-panel {
+            background: rgba(0, 0, 0, 0.85); padding: 20px; border-radius: 15px;
+            border: 2px solid var(--gold); margin-top: 100px; width: 300px; z-index: 20;
+            text-align: center;
+        }
+        input, select { 
+            width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; font-weight: bold;
+        }
+
+        /* Banner & Lanterns */
+        .header-banner { position: fixed; top: 15px; width: 85%; max-width: 500px; z-index: 10; }
+        .header-banner img { width: 100%; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); }
+        .lantern { position: fixed; top: -5px; font-size: 40px; z-index: 5; animation: swing 3s infinite alternate; transform-origin: top center; }
+        .lantern-left { left: 5%; } .lantern-right { right: 5%; }
+        @keyframes swing { 0% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } }
+
+        /* Wheel */
+        .wheel-container { position: relative; margin-top: 120px; display: none; z-index: 2; }
+        .pointer {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 35px; height: 45px; background: #ff0000; 
+            clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; border: 2px solid var(--gold);
+        }
+        canvas { border: 10px solid var(--gold); border-radius: 50%; background: #222; max-width: 80vw; max-height: 80vw; box-shadow: 0 0 50px rgba(0,0,0,0.6); }
+
+        /* Result Popup */
+        #result-display {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fffdf0; color: #333; padding: 30px; border-radius: 20px;
+            text-align: center; display: none; z-index: 100; border: 5px solid #ff0000; width: 80%;
+            box-shadow: 0 0 100px rgba(0,0,0,0.8);
+        }
+        #result-display h1 { color: #d40000; font-size: 2rem; margin: 15px 0; }
+        #prize-info { font-size: 1.5rem; font-weight: bold; color: #b30000; }
+
+        button {
+            padding: 12px 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            background: linear-gradient(to bottom, #ff4d4d, #b30000); color: var(--gold); 
+            border: 2px solid var(--gold); border-radius: 50px; box-shadow: 0 4px 0 #660000;
+        }
+        button:active { transform: translateY(2px); box-shadow: 0 2px 0 #660000; }
+        .petal { position: fixed; background-color: var(--petal); border-radius: 150% 0 150% 0; opacity: 0.8; z-index: 1; animation: fall linear infinite; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="header-banner"><img src="image_6ab226.png" alt="Khai Xuân Nhận Lộc"></div>
+<div class="lantern lantern-left">🧧</div><div class="lantern lantern-right">🧧</div>
+
+<div id="setup-panel">
+    <h3>CÀI ĐẶT VÒNG QUAY</h3>
+    <input type="number" id="qty1" placeholder="Số lượng Giải Nhất" value="1">
+    <input type="number" id="qty2" placeholder="Số lượng Giải Nhì" value="2">
+    <input type="number" id="qty3" placeholder="Số lượng Giải Ba" value="5">
+    <button onclick="initWheel()">TẠO VÒNG QUAY</button>
+</div>
+
+<div id="play-controls" style="display:none; text-align:center; z-index:15; margin-top: 100px;">
+    <select id="current-prize-type">
+        <option value="Giải Nhất">Đang quay: Giải Nhất</option>
+        <option value="Giải Nhì">Đang quay: Giải Nhì</option>
+        <option value="Giải Ba">Đang quay: Giải Ba</option>
+        <option value="Giải Khuyến Khích">Đang quay: Giải Khuyến Khích</option>
+    </select>
+    <br>
+    <button id="spinBtn">QUAY NGAY</button>
+</div>
+
+<div class="wheel-container" id="wheel-box">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="500" height="500"></canvas>
+</div>
+
+<div id="result-display">
+    <h2 style="margin:0;">🧧 CHÚC MỪNG 🧧</h2>
+    <h1>BẠN ĐÃ TRÚNG:</h1>
+    <div id="prize-info">---</div>
+    <p id="congrats-text" style="font-weight:bold;"></p>
+    <button onclick="closeModal()">TIẾP TỤC</button>
+</div>
+
+<audio id="mainSound" src="quay-so-ngan.mp3" playsinline preload="auto"></audio>
+
+<script>
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const mainSound = document.getElementById('mainSound');
+    let prizes = [];
+    let currentRotation = 0;
+    let isSpinning = false;
+
+    // Khởi tạo vòng quay dựa trên số lượng nhập vào
+    function initWheel() {
+        const q1 = parseInt(document.getElementById('qty1').value) || 0;
+        const q2 = parseInt(document.getElementById('qty2').value) || 0;
+        const q3 = parseInt(document.getElementById('qty3').value) || 0;
+
+        prizes = [];
+        for(let i=0; i<q1; i++) prizes.push({ label: "Giải Nhất", color: "#FFD700" });
+        for(let i=0; i<q2; i++) prizes.push({ label: "Giải Nhì", color: "#C0C0C0" });
+        for(let i=0; i<q3; i++) prizes.push({ label: "Giải Ba", color: "#CD7F32" });
+        
+        // Nếu ít giải quá, thêm giải may mắn cho đủ vòng
+        while(prizes.length < 8) prizes.push({ label: "Lộc Xuân", color: "#d40000" });
+
+        document.getElementById('setup-panel').style.display = 'none';
+        document.getElementById('play-controls').style.display = 'block';
+        document.getElementById('wheel-box').style.display = 'block';
+        draw();
+    }
+
+    function draw() {
+        const arc = (Math.PI * 2) / prizes.length;
+        ctx.clearRect(0, 0, 500, 500);
+        prizes.forEach((p, i) => {
+            const ang = currentRotation + i * arc;
+            ctx.beginPath();
+            ctx.fillStyle = p.color;
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            ctx.moveTo(250, 250);
+            ctx.arc(250, 250, 245, ang, ang + arc);
+            ctx.fill(); ctx.stroke();
+            ctx.save();
+            ctx.fillStyle = (p.color === "#FFD700") ? "#333" : "#fff";
+            ctx.translate(250, 250);
+            ctx.rotate(ang + arc / 2);
+            ctx.font = "bold 16px Arial";
+            ctx.textAlign = "right";
+            ctx.fillText(p.label, 230, 10);
+            ctx.restore();
+        });
+        ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(250, 250, 15, 0, Math.PI*2); ctx.fill();
+    }
+
+    document.getElementById('spinBtn').onclick = function() {
+        if (isSpinning) return;
+        isSpinning = true;
+        this.disabled = true;
+
+        mainSound.currentTime = 0;
+        mainSound.play();
+
+        const prizeType = document.getElementById('current-prize-type').value;
+        
+        // Logic tìm ô giải tương ứng với lựa chọn để dừng (Cheat ngầm)
+        let targetIdx = prizes.findIndex(p => p.label === prizeType);
+        if (targetIdx === -1) targetIdx = Math.floor(Math.random() * prizes.length);
+
+        const arc = (Math.PI * 2) / prizes.length;
+        const finalAngle = (prizes.length - targetIdx) * arc - arc/2 - (Math.PI/2);
+        const duration = 4600;
+        const totalRot = (Math.PI * 2) * 12 + finalAngle;
+        let start = null;
+
+        function animate(now) {
+            if (!start) start = now;
+            let t = (now - start) / duration;
+            if (t > 1) t = 1;
+            currentRotation = (1 - Math.pow(1 - t, 4)) * totalRot;
+            draw();
+            if (t < 1) requestAnimationFrame(animate);
+            else {
+                mainSound.onended = () => showResult(prizes[targetIdx].label, prizeType);
+                setTimeout(() => showResult(prizes[targetIdx].label, prizeType), 600);
+            }
+        }
+        requestAnimationFrame(animate);
+    };
+
+    function showResult(label, type) {
+        document.getElementById('prize-info').innerText = label;
+        document.getElementById('congrats-text').innerText = `Chúc mừng bạn đã nhận được ${type}!`;
+        document.getElementById('result-display').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('result-display').style.display = 'none';
+        document.getElementById('spinBtn').disabled = false;
+        isSpinning = false;
+    }
+
+    // Hoa đào rơi
+    setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        p.style.width = p.style.height = Math.random() * 8 + 5 + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDuration = Math.random() * 3 + 4 + 's';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 7000);
+    }, 450);
+</script>
+</body>
+</html>
